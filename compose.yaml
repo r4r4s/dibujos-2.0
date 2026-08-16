@@ -1,0 +1,15 @@
+name: dibujos
+
+services:
+  wr-core:
+    image: ghcr.io/guillaumemeyer/watermarks-remover:v0.5.0
+    ports:
+      - "127.0.0.1:8765:8765"
+    environment:
+      WATERMARKS_SERVER_API_KEY: ${WATERMARKS_SERVER_API_KEY:-}
+    read_only: true
+    tmpfs:
+      - /tmp
+    init: true
+    user: "10001:10001"
+    restart: unless-stopped
