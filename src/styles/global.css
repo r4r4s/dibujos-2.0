@@ -12,13 +12,57 @@
   --color-moss: #3f6b4a;
 }
 
+:root {
+  /* Fondo alegre para público infantil: base clara + burbujas pastel que
+     dialogan con los colores del logo (rosa, amarillo, verde, azul, morado). */
+  --bg-joyful:
+    radial-gradient(circle at 12% 18%, rgba(255, 143, 196, 0.35) 0, transparent 42%),
+    radial-gradient(circle at 88% 14%, rgba(255, 214, 92, 0.4) 0, transparent 40%),
+    radial-gradient(circle at 82% 82%, rgba(120, 214, 148, 0.35) 0, transparent 44%),
+    radial-gradient(circle at 14% 86%, rgba(122, 186, 255, 0.38) 0, transparent 44%),
+    radial-gradient(circle at 50% 50%, rgba(198, 156, 255, 0.18) 0, transparent 60%),
+    linear-gradient(160deg, #fff6fb 0%, #f3fbff 55%, #fffdf3 100%);
+}
+
 html,
 body {
   min-height: 100%;
 }
 
 body {
-  background-color: var(--color-paper);
+  background: var(--bg-joyful) fixed;
   color: var(--color-ink);
   font-family: var(--font-sans);
+}
+
+/* Pantalla de carga */
+.loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: var(--bg-joyful);
+  overflow: hidden;
+}
+
+.loader-logo {
+  position: relative;
+  width: min(80vw, 640px);
+  will-change: transform;
+  transform-origin: center center;
+}
+
+.loader-logo-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Capa en blanco y negro superpuesta; se recorta para revelar el color. */
+.loader-logo-gray {
+  position: absolute;
+  inset: 0;
+  filter: grayscale(1);
+  clip-path: inset(0 0 0 0);
 }

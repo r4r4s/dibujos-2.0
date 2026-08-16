@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import LoadingScreen from '../components/LoadingScreen';
 
 interface Props {
   title?: string;
@@ -25,6 +26,7 @@ const { title = 'Dibujos' } = Astro.props;
     <title>{title}</title>
   </head>
   <body>
+    <LoadingScreen client:load />
     <slot />
   </body>
 </html>
