@@ -1,44 +1,87 @@
-# Astro Starter Kit: Minimal
+# Dibujos 2.0
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Interfaz web para quitar marcas de procedencia (C2PA, EXIF/XMP y Unicode
+invisible) de imágenes, PDF, SVG y documentos. El procesamiento lo hace
+[watermarks-remover](https://github.com/guillaumemeyer/watermarks-remover); esta
+app es un frontend en Astro + React que expone un proxy hacia ese servicio.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Requisitos
 
-## 🚀 Project Structure
+- Node.js `>=22.12.0`
+- El servicio watermarks-remover corriendo (ver abajo)
 
-Inside of your Astro project, you'll see the following folders and files:
+## Puesta en marcha
+
+1. Instala dependencias:
+
+   ```sh
+   npm install
+   ```
+
+2. Copia la configuración de entorno:
+
+   ```sh
+   cp .env.example .env
+   ```
+
+3. Arranca el servicio watermarks-remover (elige **una** opción):
+
+   - **Docker** (recomendado):
+
+     ```sh
+     docker compose up -d
+     ```
+
+   - **Python** (usa el código en `vendor/watermarks-remover`, requiere
+     `python3.11` y sus dependencias):
+
+     ```sh
+     npm run watermarks
+     ```
+
+4. Arranca la app:
+
+   ```sh
+   npm run dev
+   ```
+
+   Disponible en `http://localhost:4321`.
+
+## Configuración
+
+Las variables de entorno se leen en runtime desde `.env` (ver `.env.example`):
+
+| Variable                     | Descripción                                                        | Por defecto             |
+| :--------------------------- | :----------------------------------------------------------------- | :---------------------- |
+| `WATERMARKS_SERVICE_URL`     | URL base del servicio watermarks-remover.                          | `http://127.0.0.1:8765` |
+| `WATERMARKS_SERVER_API_KEY`  | API key opcional; se envía como `Authorization: Bearer` al proxy.  | _(vacío)_               |
+
+## Comandos
+
+| Comando            | Acción                                              |
+| :----------------- | :-------------------------------------------------- |
+| `npm run dev`      | Servidor de desarrollo en `localhost:4321`          |
+| `npm run build`    | Compila el sitio a `./dist/`                         |
+| `npm run preview`  | Previsualiza el build de producción                 |
+| `npm run watermarks` | Arranca el servicio watermarks-remover vía Python |
+
+## Estructura
 
 ```text
 /
-├── public/
+├── public/                       # Assets estáticos (favicon)
 ├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+│   ├── components/
+│   │   └── WatermarkRemover.tsx   # UI React (carga, inspección, limpieza)
+│   ├── layouts/
+│   │   └── Layout.astro
+│   ├── lib/
+│   │   └── watermarks.ts          # Proxy hacia el servicio (allow-list)
+│   ├── pages/
+│   │   ├── api/watermarks/[...path].ts
+│   │   └── index.astro
+│   └── styles/
+│       └── global.css
+├── compose.yaml                  # Servicio watermarks-remover en Docker
+└── vendor/watermarks-remover/    # Código del servicio upstream
 ```
-
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
-# dibujos-2.0
