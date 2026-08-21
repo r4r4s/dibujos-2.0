@@ -95,8 +95,27 @@ a color) mientras carga y, al completarse, una transición en la que la cámara
 - **Montaje:** en `src/layouts/Layout.astro`, como primer hijo del `<body>`.
 - **Estilos:** bloque "Pantalla de carga" en `src/styles/global.css`.
 - **Dependencia:** `gsap` ^3.15.0.
-- **Parámetros:** `MIN_DURATION = 2.2 s`; zoom de salida `scale: 22`
+- **Parámetros:** `MIN_DURATION_MS = 2200`; zoom de salida `scale: 22`
   (`power3.in`) con fundido del overlay.
+
+### Progreso ligado a la carga real
+
+El barrido sigue el progreso **real** de carga de la página mediante hitos del
+navegador (fracción `0..1`):
+
+- DOM listo (`DOMContentLoaded` / `readyState`) → 0.35
+- Fuentes listas (`document.fonts.ready`) → 0.65
+- Todos los recursos (`window.load`) → 1.0
+
+Cada frame: `mostrado = min(cargaReal_suavizada, tiempo / MIN_DURATION_MS)`.
+
+- Si la página carga **más rápido** que el mínimo, el barrido tarda exactamente
+  `MIN_DURATION_MS` (~2,2 s).
+- Si carga **más lento**, el barrido sigue la carga real y termina poco después
+  de `window.load`.
+
+Solo se suaviza (lerp) la fracción de carga, que llega a saltos; el tope de
+tiempo ya es continuo, por eso el suelo es exactamente el mínimo.
 
 ### Nota de comportamiento (rAF y pestañas ocultas)
 

@@ -46,11 +46,64 @@ body {
   overflow: hidden;
 }
 
+.loader-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+}
+
 .loader-logo {
   position: relative;
   width: min(80vw, 640px);
   will-change: transform;
   transform-origin: center center;
+}
+
+.loader-text {
+  font-family: "Roboto", var(--font-sans);
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--color-ink);
+  opacity: 0.6;
+  will-change: transform;
+  transform-origin: center center;
+}
+
+/* Los puntos aparecen de uno en uno: . → .. → ... → otra vez */
+.loader-dots {
+  display: inline-block;
+  width: 1.1em;
+  text-align: left;
+}
+
+.loader-dots::after {
+  content: ".";
+  animation: loader-dots 1.4s infinite;
+}
+
+/* content no se interpola: cada rango mantiene su valor y salta al siguiente. */
+@keyframes loader-dots {
+  0%,
+  33.32% {
+    content: ".";
+  }
+  33.33%,
+  66.65% {
+    content: "..";
+  }
+  66.66%,
+  100% {
+    content: "...";
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-dots::after {
+    content: "...";
+    animation: none;
+  }
 }
 
 .loader-logo-img {
