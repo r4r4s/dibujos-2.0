@@ -1,19 +1,171 @@
 ---
+export const prerender = true;
+
 import Layout from '../layouts/Layout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { CATEGORIES, countDibujos } from '../lib/dibujos';
+
+const categories = CATEGORIES.map((c) => ({ ...c, count: countDibujos(c.slug) })).sort(
+  (a, b) => b.count - a.count,
+);
+
+const total = categories.reduce((sum, c) => sum + c.count, 0);
+
+const base = Astro.site?.href ?? `${Astro.url.origin}/`;
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Nibiru Paint',
+    url: base,
+    description: `${total} dibujos para colorear gratis para niños, descargables en PDF o imagen.`,
+    inLanguage: 'es',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Categorías de dibujos para colorear',
+    numberOfItems: categories.length,
+    itemListElement: categories.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.name,
+      url: new URL(`/categoria/${c.slug}`, base).href,
+    })),
+  },
+];
+
+const title = 'Dibujos para colorear para niños · Nibiru Paint';
+const description = `${total} dibujos para colorear gratis para niños: animales, mandalas, vehículos, abecedario y más. Descárgalos en PDF o imagen y ¡a pintar!`;
 ---
 
-<Layout title="Nibiru Paint">
-	<main class="mx-auto grid min-h-screen max-w-3xl place-items-center px-6 py-12 text-center">
-		<div>
-			<p class="text-sm font-medium tracking-wide text-ochre uppercase">
-				Nibiru Paint
-			</p>
-			<h1 class="font-serif mt-2 text-4xl font-medium tracking-tight">
-				Próximamente
-			</h1>
-			<p class="mt-3 text-[15px] leading-relaxed text-ink/70">
-				Aquí irá la aplicación.
-			</p>
-		</div>
-	</main>
+<Layout title={title} description={description}>
+  <script
+    slot="head"
+    type="application/ld+json"
+    set:html={JSON.stringify(jsonLd)}
+  />
+
+  <SiteHeader />
+
+  <main>
+    <!-- Hero -->
+    <section class="mx-auto grid max-w-6xl items-center gap-10 px-6 pt-10 pb-6 md:grid-cols-2 md:pt-16 md:pb-10">
+      <div>
+        <p class="text-sm font-semibold tracking-wide text-ochre uppercase">
+          Nibiru Paint
+        </p>
+        <h1 class="font-serif mt-2 text-4xl leading-[1.05] font-medium tracking-tight text-ink sm:text-5xl lg:text-6xl">
+          Dibujos para <span class="text-ochre">colorear</span> para niños
+        </h1>
+        <p class="mt-4 max-w-md text-[17px] leading-relaxed text-ink/70">
+          Elige entre {total} dibujos gratis —animales, mandalas, vehículos y
+          mucho más—, descárgalos en <strong class="font-semibold text-ink">PDF</strong> o
+          imagen y ¡a pintar!
+        </p>
+        <div class="mt-7 flex flex-wrap items-center gap-4">
+          <a
+            href="#categorias"
+            class="rounded-full bg-ochre px-6 py-3 text-base font-medium text-white shadow-sm transition hover:bg-ochre-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+          >
+            Explorar dibujos
+          </a>
+          <dl class="flex gap-5 text-sm text-ink/70">
+            <div>
+              <dt class="sr-only">Dibujos</dt>
+              <dd><span class="font-serif text-xl text-ink">{total}</span> dibujos</dd>
+            </div>
+            <div>
+              <dt class="sr-only">Categorías</dt>
+              <dd><span class="font-serif text-xl text-ink">{categories.length}</span> categorías</dd>
+            </div>
+            <div>
+              <dt class="sr-only">Precio</dt>
+              <dd><span class="font-serif text-xl text-ink">100%</span> gratis</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+      <div class="justify-self-center">
+        <img
+          src="/logo.webp"
+          alt="Logo de Nibiru Paint"
+          width="900"
+          height="237"
+          class="w-full max-w-md drop-shadow-sm"
+          fetchpriority="high"
+        />
+      </div>
+    </section>
+
+    <!-- Categorías -->
+    <section id="categorias" class="mx-auto max-w-6xl scroll-mt-20 px-6 py-10">
+      <div class="mb-6 flex items-end justify-between gap-4">
+        <h2 class="font-serif text-3xl font-medium tracking-tight text-ink">
+          Explora las categorías
+        </h2>
+        <p class="hidden text-sm text-ink/60 sm:block">{total} dibujos listos para colorear</p>
+      </div>
+
+      <ul class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {categories.map((c) => (
+          <li class="min-w-0">
+            <a
+              href={`/categoria/${c.slug}`}
+              class="group block rounded-3xl p-4 shadow-sm ring-1 ring-black/5 transition duration-200 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink motion-reduce:transform-none motion-reduce:transition-none"
+              style={`background:${c.tint}`}
+            >
+              <div class="relative aspect-square overflow-hidden rounded-2xl bg-white/70">
+                <span class="absolute left-2 top-2 text-xl" aria-hidden="true">{c.emoji}</span>
+                <img
+                  src={c.thumb}
+                  alt={`Dibujos de ${c.name.toLowerCase()} para colorear`}
+                  width="400"
+                  height="400"
+                  loading="lazy"
+                  decoding="async"
+                  class="h-full w-full object-contain p-3 transition-transform duration-200 group-hover:scale-105 motion-reduce:transform-none"
+                />
+              </div>
+              <div class="mt-3 flex min-w-0 items-center justify-between gap-2 px-1">
+                <h3 class="min-w-0 font-serif text-lg leading-tight text-ink">{c.name}</h3>
+                <span class="shrink-0 rounded-full bg-white/70 px-2.5 py-0.5 text-xs font-medium text-ink/70">
+                  {c.count}
+                </span>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Cómo funciona -->
+    <section class="mx-auto max-w-6xl px-6 py-10">
+      <div class="rounded-[2rem] bg-white/55 p-8 ring-1 ring-black/5 sm:p-10">
+        <h2 class="font-serif text-3xl font-medium tracking-tight text-ink">
+          Colorear es muy fácil
+        </h2>
+        <ol class="mt-8 grid gap-8 sm:grid-cols-3">
+          {[
+            { n: 1, t: 'Elige un dibujo', d: 'Explora las categorías y encuentra tu favorito.' },
+            { n: 2, t: 'Descárgalo', d: 'En PDF para imprimir o en imagen, siempre gratis.' },
+            { n: 3, t: '¡A pintar!', d: 'Colorea a tu gusto con lápices, ceras o rotuladores.' },
+          ].map((step) => (
+            <li class="flex gap-4">
+              <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-ochre font-serif text-lg font-medium text-white">
+                {step.n}
+              </span>
+              <div>
+                <h3 class="font-serif text-xl text-ink">{step.t}</h3>
+                <p class="mt-1 text-[15px] leading-relaxed text-ink/70">{step.d}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
 </Layout>
