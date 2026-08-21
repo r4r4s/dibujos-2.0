@@ -4,9 +4,18 @@ import LoadingScreen from '../components/LoadingScreen';
 
 interface Props {
   title?: string;
+  description?: string;
+  image?: string;
 }
 
-const { title = 'Dibujos' } = Astro.props;
+const {
+  title = 'Nibiru Paint',
+  description = 'Dibujos para colorear gratis para niños: descárgalos en PDF o imagen y a pintar.',
+  image = '/logo.webp',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
+const ogImage = new URL(image, Astro.site ?? Astro.url.origin);
 ---
 
 <!doctype html>
@@ -16,13 +25,37 @@ const { title = 'Dibujos' } = Astro.props;
     <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
+
+    <!-- SEO -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#fff6fb" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Nibiru Paint" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=Roboto:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <title>{title}</title>
+
+    <slot name="head" />
   </head>
   <body>
     <LoadingScreen client:load />
